@@ -72,7 +72,7 @@
 ## 🧲 ArUco 마커 인식 및 좌표 검출
 #🎥 실시간 ArUco 마커 기반 좌표 검출 및 Pick-and-Place 
 
-	![aruco_pick.gif](image/aruco_pick.gif)
+![aruco_pick.gif](image/aruco_pick.gif)
 
    - 실시간으로 ArUco 마커를 인식한 후, 마커의 3D 위치를 추정하여 로봇 팔이 해당 위치로 이동해 집는 동작을 수행합니다.
 
