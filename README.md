@@ -53,6 +53,82 @@
 - 이벤트 로그 (예: “빨간불이 감지되었습니다. 정지합니다.”)
 
 ---
+##실제 터틀봇 주행
+## 🛣️ Lane Detection Optimization
+
+### ⚙️ Why Optimization Was Needed
+- 시뮬레이션과 달리 실제 주행에서는 **하드웨어 성능 한계**와 **강한 빛 반사** 문제가 발생했습니다.
+- `라인트레이싱 + MoveIt 동작`을 동시에 수행하기 위해서는 **최적화된 라인트레이싱**이 필수였습니다.
+
+---
+
+### 📉 Optimization Strategy
+- **이미지 화질**: 320x240
+- **형식 변경**: 컬러 영상 → 흑백 `compressed` 영상
+- **연산 간소화 및 빛 반사 제거**:
+  - 흑백 영상에서 **임계값 기반 이진화**
+  - **모폴로지 연산**으로 작은 빛 반사 제거
+  - **contour 추출**
+  - `area < 500`인 contour 제거
+
+| 곡선 영역 원본 | 곡선 영역 필터링 결과 |
+|:--:|:--:|
+| ![curve](curve.png) | ![curve binary](linecontour16000.png) |
+
+---
+
+### ➗ 차선 분리 방식
+
+#### ✅ 1개 라인만 검출된 경우
+- 검출된 라인의 **2차 다항식 근사 → 기울기 추출**
+- **기울기(angle)** 기준 판단:
+  - `> +10도`: 좌회전 중 → **오른쪽 차선**
+  - `< -10도`: 우회전 중 → **왼쪽 차선**
+  - `-10 ~ +10도`: 직진 → x 좌표 기준으로 왼/오 판단
+
+#### ✅ 2개 이상 라인 검출된 경우
+- 가장 큰 **2개 contour 선택**
+- 각 contour의 중심 x값 비교 → 왼/오 차선 분리
+
+| 2개 라인 탐지 예시 | 터미널 출력 |
+|:--:|:--:|
+| ![2line](straight.png) | ![log](https://chat.openai.com/blob/processed/file-GoyYSgmRqEshPKsfi8dxtv/fig4.png) |
+
+---
+
+### 🧠 fit_from_lines() 한계 보완
+- 기존의 `fit_from_lines()`는 속도는 빠르지만 **곡선 구간**에서 성능 저하
+- → **곡선 상황에선 sliding window 방식으로 탐색** 전환
+
+| 곡선 구간 판단 예시 | 출력 |
+|:--:|:--:|
+| ![curve](curve.png) | ![log](https://chat.openai.com/blob/processed/file-GoyYSgmRqEshPKsfi8dxtv/fig5.png) |
+
+---
+
+### 🧩 H자 차선 문제 해결
+- 아래 이미지처럼 H자 모양 차선을 **하나의 contour**로 판단 → 라인 분리 실패
+
+| H자 차선 원본 | 추출 결과 |
+|:--:|:--:|
+| ![H line](H.png) | ![binary](linecontour_20000.png) |
+
+- 해결 전략:
+  - **Contour 영역이 20,000 이상일 경우**
+  - 중심선을 기준으로 **contour 분할**
+  - 라인 분리 성공
+
+| 분할 로직 적용 출력 |
+|:--:|
+| ![log](https://chat.openai.com/blob/processed/file-GoyYSgmRqEshPKsfi8dxtv/fig6.png) |
+
+---
+
+### ✅ 결과
+- 빛 반사 제거 및 연산 최적화로 **안정적인 라인트레이싱 성능 확보**
+- 다양한 상황 (곡선/직선/H자)에서도 **유연한 차선 분리** 가능
+
+---
 
 ## 📈 7️⃣ 비선형 속도 제어 설계 (에러 기반)
 ![7.png](image/7.png)  
@@ -69,6 +145,8 @@
 - 상단: 선속도(`linear.x`) 로그
 - 하단: 각속도(`angular.z`) 로그  
 - 정지/회전/진입 상황에서의 속도 변화 확인 가능
+
+
 ## 🧲 ArUco 마커 인식 및 좌표 검출
 #🎥 실시간 ArUco 마커 기반 좌표 검출 및 Pick-and-Place 
 
