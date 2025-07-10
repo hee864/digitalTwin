@@ -73,7 +73,7 @@
 
 | 곡선 영역 원본 | 곡선 영역 필터링 결과 |
 |:--:|:--:|
-| ![curve](curve.png) | ![curve binary](linecontour16000.png) |
+| ![curve](image/curve.png) | ![curve binary](image/linecontour16000.png) |
 
 ---
 
@@ -92,7 +92,7 @@
 
 | 2개 라인 탐지 예시 | 터미널 출력 |
 |:--:|:--:|
-| ![2line](straight.png) | ![log](https://chat.openai.com/blob/processed/file-GoyYSgmRqEshPKsfi8dxtv/fig4.png) |
+| ![2line](image/straight.png) | ![log](https://chat.openai.com/blob/processed/file-GoyYSgmRqEshPKsfi8dxtv/fig4.png) |
 
 ---
 
@@ -111,7 +111,7 @@
 
 | H자 차선 원본 | 추출 결과 |
 |:--:|:--:|
-| ![H line](H.png) | ![binary](linecontour_20000.png) |
+| ![H line](H.png) | ![binary](image/linecontour_20000.png) |
 
 - 해결 전략:
   - **Contour 영역이 20,000 이상일 경우**
