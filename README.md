@@ -1,4 +1,34 @@
-# ROS2 기반 자율주행 시뮬레이션 프로젝트
+# Digital Twin Autonomous Driving
+
+> ROS2와 Gazebo 디지털 트윈을 기반으로 인지·판단·제어·Pick-and-Place를 통합한 TurtleBot3 자율주행 시스템
+
+시뮬레이션에서 설계한 도시형 자율주행 시나리오를 실제 TurtleBot3 환경으로 확장한 프로젝트입니다. 교통 신호와 표지판, 차선, 사람, 경사로를 인식하고 FSM 기반 판단과 차선 추종 제어를 통해 주행합니다. 실제 환경에서는 영상 처리 연산량과 빛 반사 문제를 개선했으며, ArUco 마커와 MoveIt을 연동해 물체 픽업 기능까지 구현했습니다.
+
+## 프로젝트 요약
+
+| 구분 | 내용 |
+| --- | --- |
+| 플랫폼 | TurtleBot3, ROS2 Humble, Gazebo |
+| 인지 | SIFT, OpenCV, ArUco Marker, 카메라, IMU |
+| 판단 및 제어 | FSM, PD 제어, 비선형 속도 제어 |
+| 매니퓰레이션 | ArUco 3D pose, TF 좌표 변환, MoveIt |
+| 모니터링 | PyQt, 카메라·미니맵·속도·이벤트 로그 시각화 |
+
+## 담당 역할
+
+- 교통 신호와 표지판 인식을 위한 SIFT keypoint matching 구현
+- 실제 주행 환경의 차선 검출 경량화와 빛 반사 제거
+- 직선·곡선·H자 차선에 대응하는 contour/sliding window 전환 로직 구현
+- 차선 중심 오차에 따른 PD 조향 및 비선형 속도 제어 튜닝
+- IMU pitch 기반 경사로 판별과 오르막·내리막 속도 보정
+- ArUco 마커 3D 위치 추정, TF 변환, MoveIt Pick-and-Place 연동
+- PyQt 기반 실시간 주행 상태 및 이벤트 디버깅 UI 구현
+
+## 핵심 성과
+
+- Gazebo와 실제 로봇에서 동일한 인지-판단-제어 흐름을 검증했습니다.
+- 제한된 온보드 연산 환경에서도 동작하도록 영상 해상도와 처리 과정을 최적화했습니다.
+- 주행뿐 아니라 로봇팔 작업까지 연결해 이동과 조작이 결합된 서비스 시나리오를 구현했습니다.
 
 본 프로젝트는 TurtleBot3를 활용한 **ROS2 기반의 자율주행 로봇 시스템**으로, 다양한 교통 표지판 인식, 차선 기반 경로 추종, 교차로 판단 및 회피 등의 기능을 통합하여 실제 도로 상황과 유사한 시나리오를 구현했습니다.
 그 후 실제 터틀봇을 활요한 주행 및 픽업서비스를 구현했습니다.
@@ -8,6 +38,23 @@
 |----------------|------------------|
 | [![실제 주행 영상](http://img.youtube.com/vi/t-657SxmHgo/0.jpg)](https://youtu.be/t-657SxmHgo) | [![Gazebo 시뮬레이션 영상](http://img.youtube.com/vi/eU3tc6r3l6o/0.jpg)](https://youtu.be/eU3tc6r3l6o) |
 
+## V-모델 개발 프로세스
+
+사용자 주행 시나리오를 시스템·소프트웨어 요구사항으로 구체화하고, ROS2 아키텍처와 노드 구현을 Gazebo 통합 시험 및 실제 TurtleBot 검증에 연결했습니다. 요구사항 ID는 인지·판단·제어 구성요소, topic 인터페이스와 시험 시나리오에 양방향으로 추적됩니다.
+
+| 왼쪽 개발 단계 | 오른쪽 검증 단계 |
+| --- | --- |
+| 사용자 주행·조작 시나리오 | 실제 TurtleBot 시스템 검증 |
+| 시스템 요구사항 | Gazebo 전체 코스 시험 |
+| ROS2 시스템 아키텍처 | Topic·TF·MoveIt 통합 시험 |
+| 노드 상세 설계와 구현 | 차선·SIFT·제어·ArUco 단위 검증 |
+
+- [V-모델 개요](docs/v-model/README.md)
+- [요구사항 명세](docs/v-model/requirements.md)
+- [아키텍처](docs/v-model/architecture.md)
+- [검증 및 확인](docs/v-model/verification-validation.md)
+- [추적성 매트릭스](docs/v-model/traceability-matrix.md)
+- [형상·변경·문제관리](docs/v-model/supporting-processes.md)
 
 # 🧪 Gazebo 시뮬레이션
 
@@ -252,4 +299,3 @@
 ## ✍️ 작성자
 - **이름**: 이희우
 - **이메일**: wkrldowk1@gmail.com  
-
